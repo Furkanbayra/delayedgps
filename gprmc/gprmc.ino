@@ -18,17 +18,15 @@ void setup() {
 
 byte calculateChecksum(const String& sentence) {  // checksum oluşturucu
   byte checksum = 0;
-
-  // '$' karakterinden sonra başlayarak '*' karakterine kadar olan tüm karakterleri XOR işlemine tabi tutun
   for (int i = 1; i < sentence.length(); i++) {
-    if (sentence[i] == '*') break;  // '*' karakterine ulaşıldığında döngüyü durdurun
+    if (sentence[i] == '*') break;  
     checksum ^= sentence[i];
   }
   return checksum;
 }
 
 
-String createNmeaSentence(const String& sentenceId, const String& data) {  // NMEA sentence oluşturucu
+String createNmeaSentence(const String& sentenceId, const String& data) {
   String sentence = "$" + sentenceId + "," + data;
   byte checksum = calculateChecksum(sentence);
   String checksumHex = String(checksum, HEX);
@@ -49,15 +47,12 @@ int splitString(String input, char separator, String* parts, int maxParts) {
   int partCount = 0;
   int startIndex = 0;
   int endIndex = input.indexOf(separator);
-
   while (endIndex != -1 && partCount < maxParts - 1) {
     parts[partCount] = input.substring(startIndex, endIndex);
     startIndex = endIndex + 1;
     endIndex = input.indexOf(separator, startIndex);
     partCount++;
   }
-
-  // Add the last part of the string
   if (partCount < maxParts) {
     parts[partCount] = input.substring(startIndex);
     partCount++;
@@ -81,9 +76,8 @@ void processRMC(const char* rmcData) {
   String field8 = rpmcparts[9];
   String field9 = rpmcparts[10];
   String field10 = rpmcparts[11];
-  String field11 = rpmcparts[12];
-  String rawrmcData = newTime + "," + field2 + "," + field3 + "," + field4 + "," + field5 + "," + field6 + "," + field7 + "," + field8 + "," + field9 + "," + field10 + "," + field11;
-  String rmcSentence = createNmeaSentence("GPRMC", rmcData);
+  String rawrmcData = newTime + "," + field2 + "," + field3 + "," + field4 + "," + field5 + "," + field6 + "," + field7 + "," + field8 + "," + field9 + "," + field10 ;
+  String rmcSentence = createNmeaSentence("GPRMC", rawrmcData);
   Serial.println("SS-GPS," + rmcSentence + "-T");
 }
 
@@ -125,10 +119,6 @@ void loop() {
           sentence.trim();
           processRMC(sentence.c_str());
           rmcFound = true;
-          Serial.println("RMC FOUND");
-          Serial.println("Buffer DATA: " + String(inputBuffer));
-          Serial.println("Buffer SIZE: " + String(bufferIndex));
-
           break;
         }
       }
